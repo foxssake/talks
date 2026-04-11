@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://bta26yrd43g4v"]
+
+[sub_resource type="GDScript" id="GDScript_0bu3b"]
+script/source = "extends CharacterBody3D
+
+@export var move_speed := 8.
+@export var gravity := 24.
+
+func _ready() -> void:
+	# Set player color
+	var hue := (hash(get_multiplayer_authority()) % 8192) / 8192.
+	var color := Color.from_ok_hsl(hue, 1., .5)
+
+	for node in find_children(\"*\", \"MeshInstance3D\"):
+		var mesh_instance := node as MeshInstance3D
+		var material := mesh_instance.get_surface_override_material(0) as StandardMaterial3D
+		if not material:
+			continue
+
+		material = material.duplicate()
+		material.albedo_color = color
+
+		mesh_instance.set_surface_override_material(0, material)
+
+func _physics_process(dt: float) -> void:
+	if not is_multiplayer_authority():
+		return
+
+	var input_movement := Vector3(
+		Input.get_axis(\"move_west\", \"move_east\"),
+		0.,
+		Input.get_axis(\"move_north\", \"move_south\")
+	)
+	if not DisplayServer.window_is_focused():
+		input_movement = Vector3.ZERO
+
+	var movement_basis := get_viewport().get_camera_3d().basis
+
+	var movement := movement_basis * input_movement
+	movement.y = 0.
+	movement = movement.normalized() * move_speed
+
+	velocity.x = movement.x
+	velocity.y -= gravity * dt
+	velocity.z = movement.z
+
+	move_and_slide()
+"
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0bu3b"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0bu3b"]
+roughness = 0.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8pphn"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8pphn"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Player" type="CharacterBody3D" unique_id=641851103]
+physics_interpolation_mode = 1
+floor_max_angle = 1.0471976
+floor_snap_length = 0.25
+script = SubResource("GDScript_0bu3b")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1579586147]
+gi_mode = 2
+mesh = SubResource("CapsuleMesh_0bu3b")
+surface_material_override/0 = SubResource("StandardMaterial3D_0bu3b")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1604824018]
+shape = SubResource("CapsuleShape3D_8pphn")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2060461282]
+replication_config = SubResource("SceneReplicationConfig_8pphn")

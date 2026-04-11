@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://sh0vsp567ycd"]
+
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://assets/sandbox.tscn" id="1_06hxl"]
+
+[sub_resource type="GDScript" id="GDScript_06hxl"]
+script/source = "extends MultiplayerSpawner
+
+@export var spawn_points: Array[Node3D]
+
+var _avatars := {} as Dictionary[int, Node3D]
+
+func _ready() -> void:
+	spawn_function = _spawn
+
+	NetworkEvents.on_server_start.connect(func(): spawn(1))
+	NetworkEvents.on_peer_join.connect(func(peer: int): spawn(peer))
+	NetworkEvents.on_peer_leave.connect(func(peer: int): _despawn(peer))
+
+func _spawn(peer: int) -> Node3D:
+	var spawnable_scene := load(get_spawnable_scene(0)) as PackedScene
+	var avatar := spawnable_scene.instantiate() as Node3D
+
+	avatar.set_multiplayer_authority(peer)
+	_avatars[peer] = avatar
+
+	var spawn_idx := peer % spawn_points.size()
+	avatar.position = spawn_points[spawn_idx].global_position
+
+	return avatar
+
+func _despawn(peer: int) -> void:
+	if not _avatars.has(peer):
+		return
+
+	var avatar := _avatars[peer]
+	avatar.queue_free()
+	_avatars.erase(peer)
+"
+
+[sub_resource type="GDScript" id="GDScript_wtker"]
+script/source = "extends Label
+
+func _physics_process(_dt: float) -> void:
+	text = \"FPS: ~%d\" % [Engine.get_frames_per_second()]
+"
+
+[node name="GodotClientAuth" type="Node3D" unique_id=400555213]
+
+[node name="Sandbox" parent="." unique_id=473015736 instance=ExtResource("1_06hxl")]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=290321312 node_paths=PackedStringArray("spawn_points")]
+_spawnable_scenes = PackedStringArray("uid://bta26yrd43g4v")
+spawn_path = NodePath(".")
+script = SubResource("GDScript_06hxl")
+spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
+
+[node name="UI" type="Control" parent="." unique_id=41675039]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI" unique_id=1732968701]
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 23.0
+text = "FPS: ~"
+script = SubResource("GDScript_wtker")
+
+[editable path="Sandbox"]
+[editable path="Sandbox/sandbox"]
