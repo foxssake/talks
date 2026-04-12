@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://sh0vsp567ycd"]
 
-[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://assets/sandbox.tscn" id="1_06hxl"]
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_06hxl"]
 
 [sub_resource type="GDScript" id="GDScript_06hxl"]
 script/source = "extends MultiplayerSpawner
@@ -37,6 +37,25 @@ func _despawn(peer: int) -> void:
 	_avatars.erase(peer)
 "
 
+[sub_resource type="GDScript" id="GDScript_gtbv1"]
+script/source = "extends Label
+
+func _physics_process(_dt: float) -> void:
+	text = _get_multiplayer_label()
+
+func _get_multiplayer_label() -> String:
+	if not multiplayer.has_multiplayer_peer():
+		return \"disconnected\"
+
+	if multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED:
+		return \"disconnected\"
+
+	if multiplayer.is_server():
+		return \"server\"
+
+	return \"client #%d\" % multiplayer.get_unique_id()
+"
+
 [sub_resource type="GDScript" id="GDScript_wtker"]
 script/source = "extends Label
 
@@ -62,10 +81,36 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="UI" unique_id=1732968701]
+[node name="Top Bar" type="PanelContainer" parent="UI" unique_id=1653380441]
 layout_mode = 1
-offset_right = 40.0
-offset_bottom = 23.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 72.0
+grow_horizontal = 2
+
+[node name="Whoami" type="VBoxContainer" parent="UI/Top Bar" unique_id=1618387780]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 7.0
+
+[node name="Label" type="Label" parent="UI/Top Bar/Whoami" unique_id=1803490907]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 32
+text = "Server"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+script = SubResource("GDScript_gtbv1")
+
+[node name="Stats" type="HBoxContainer" parent="UI/Top Bar/Whoami" unique_id=625176131]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Top Bar/Whoami/Stats" unique_id=1732968701]
+layout_mode = 2
 text = "FPS: ~"
 script = SubResource("GDScript_wtker")
 

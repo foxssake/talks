@@ -3,7 +3,7 @@
 importer="2d_array_texture"
 type="CompressedTexture2DArray"
 uid="uid://412gvmxdv4nf"
-path.s3tc="res://.godot/imported/sandbox_shadow.png-5d8e13f8d45593bbf2e03b2619f22971.s3tc.ctexarray"
+path.s3tc="res://.godot/imported/sandbox_shadow.png-cd6fecd39f4b923d44de20a244ceb60e.s3tc.ctexarray"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sandbox_shadow.png"
-dest_files=["res://.godot/imported/sandbox_shadow.png-5d8e13f8d45593bbf2e03b2619f22971.s3tc.ctexarray"]
+source_file="res://shared/assets/sandbox_shadow.png"
+dest_files=["res://.godot/imported/sandbox_shadow.png-cd6fecd39f4b923d44de20a244ceb60e.s3tc.ctexarray"]
 
 [params]
 

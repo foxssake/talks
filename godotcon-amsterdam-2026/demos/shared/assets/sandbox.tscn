@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cka043pyub1a"]
 
-[ext_resource type="LightmapGIData" uid="uid://ctq8k2x0mh054" path="res://assets/sandbox.lmbake" id="1_7dnar"]
-[ext_resource type="PackedScene" uid="uid://ed03p1exin7u" path="res://assets/sandbox.blend" id="1_ksnu8"]
+[ext_resource type="LightmapGIData" uid="uid://ctq8k2x0mh054" path="res://shared/assets/sandbox.lmbake" id="1_7dnar"]
+[ext_resource type="PackedScene" uid="uid://ed03p1exin7u" path="res://shared/assets/sandbox.blend" id="1_ksnu8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ksnu8"]
 sky_top_color = Color(0.242, 0.3278, 0.44, 1)

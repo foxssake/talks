@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ed03p1exin7u"
-path="res://.godot/imported/sandbox.blend-4c986716e31dc96b0d11e76b6822dd0f.scn"
+path="res://.godot/imported/sandbox.blend-09cb84d87a70c15bc506b72d36c5fc31.scn"
 
 [deps]
 
-source_file="res://assets/sandbox.blend"
-dest_files=["res://.godot/imported/sandbox.blend-4c986716e31dc96b0d11e76b6822dd0f.scn"]
+source_file="res://shared/assets/sandbox.blend"
+dest_files=["res://.godot/imported/sandbox.blend-09cb84d87a70c15bc506b72d36c5fc31.scn"]
 
 [params]
 

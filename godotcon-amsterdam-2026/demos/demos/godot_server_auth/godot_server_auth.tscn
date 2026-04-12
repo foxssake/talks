@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://com2s7j65ybhx"]
+
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_ges4l"]
+[ext_resource type="PackedScene" uid="uid://dxw74vrvvm3ov" path="res://shared/assets/ui.tscn" id="2_7ren2"]
+
+[sub_resource type="GDScript" id="GDScript_ges4l"]
+script/source = "extends MultiplayerSpawner
+
+@export var spawn_points: Array[Node3D]
+
+var _avatars := {} as Dictionary[int, Node3D]
+
+func _ready() -> void:
+	spawn_function = _spawn
+
+	NetworkEvents.on_server_start.connect(func(): spawn(1))
+	NetworkEvents.on_peer_join.connect(func(peer: int): spawn(peer))
+	NetworkEvents.on_peer_leave.connect(func(peer: int): _despawn(peer))
+
+func _spawn(peer: int) -> Node3D:
+	var spawnable_scene := load(get_spawnable_scene(0)) as PackedScene
+	var avatar := spawnable_scene.instantiate() as Node3D
+
+	if avatar.has_method(\"set_peer\"):
+		avatar.set_peer(peer)
+	else:
+		avatar.set_multiplayer_authority(peer)
+	_avatars[peer] = avatar
+
+	var spawn_idx := peer % spawn_points.size()
+	avatar.position = spawn_points[spawn_idx].global_position
+
+	return avatar
+
+func _despawn(peer: int) -> void:
+	if not _avatars.has(peer):
+		return
+
+	var avatar := _avatars[peer]
+	avatar.queue_free()
+	_avatars.erase(peer)
+"
+
+[node name="GodotServerAuth" type="Node3D" unique_id=1393235173]
+
+[node name="Sandbox" parent="." unique_id=473015736 instance=ExtResource("1_ges4l")]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1171691290 node_paths=PackedStringArray("spawn_points")]
+_spawnable_scenes = PackedStringArray("uid://bvdetmjv0ju2d")
+spawn_path = NodePath(".")
+script = SubResource("GDScript_ges4l")
+spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
+
+[node name="UI" parent="." unique_id=1035520272 instance=ExtResource("2_7ren2")]
+
+[editable path="Sandbox"]
+[editable path="Sandbox/sandbox"]

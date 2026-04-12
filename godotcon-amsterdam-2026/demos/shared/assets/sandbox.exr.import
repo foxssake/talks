@@ -3,7 +3,7 @@
 importer="2d_array_texture"
 type="CompressedTexture2DArray"
 uid="uid://ctxspwjdbcbq0"
-path.bptc="res://.godot/imported/sandbox.exr-fc206a73097cee51542bf14f65804146.bptc.ctexarray"
+path.bptc="res://.godot/imported/sandbox.exr-17e91f13ad256cff06204b0a0812e63f.bptc.ctexarray"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sandbox.exr"
-dest_files=["res://.godot/imported/sandbox.exr-fc206a73097cee51542bf14f65804146.bptc.ctexarray"]
+source_file="res://shared/assets/sandbox.exr"
+dest_files=["res://.godot/imported/sandbox.exr-17e91f13ad256cff06204b0a0812e63f.bptc.ctexarray"]
 
 [params]
 
