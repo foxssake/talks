@@ -1,8 +1,6 @@
 extends RefCounted
 class_name NetworkClockSample
 
-# @private class
-
 var ping_sent: float
 var ping_received: float
 var pong_sent: float

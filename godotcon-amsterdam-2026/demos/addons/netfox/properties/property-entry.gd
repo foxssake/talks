@@ -1,8 +1,6 @@
 extends RefCounted
 class_name PropertyEntry
 
-# @private class
-
 var _path: String
 var node: Node
 var property: String

@@ -2,12 +2,12 @@
 extends Node
 class_name PredictiveSynchronizer
 
-## Similar to [RollbackSynchronizer], this class manages local variables in a
+## Similar to [RollbackSynchronizer], this class manages local variables in a 
 ## rollback context for predictive simulation without networking.
 ##
 ## This is a simplified version that focuses on local state management.
 ## [br][br]
-## Like [RollbackSynchronizer], it automatically discovers nodes
+## Like [RollbackSynchronizer], it automatically discovers nodes 
 ## with a [code]_rollback_tick(delta: float, tick: int)[/code]
 ## method and calls them during the prediction phase.
 
@@ -23,76 +23,44 @@ class_name PredictiveSynchronizer
 ## the tick.
 @export var state_properties: Array[String]
 
-var _state_properties := _PropertyPool.new()
-var _sim_nodes: Array[Node] = []
-var _liveness_nodes: Array[Node] = []
+var _state_property_config: _PropertyConfig = _PropertyConfig.new()
+var _property_cache := PropertyCache.new(root)
+var _freshness_store := RollbackFreshnessStore.new()
+
+var _states := _PropertyHistoryBuffer.new()
+var _nodes: Array[Node] = []
+var _skipset: _Set = _Set.new()
 
 var _properties_dirty: bool = false
 
+# Composition
+var _history_recorder: _RollbackHistoryRecorder
+
 ## Process settings.
-## [br][br]
+##
 ## Call this after any change to configuration.
 func process_settings() -> void:
-	# Deregister all nodes we've registered previously
-	for subject in _state_properties.get_subjects():
-		NetworkHistoryServer.deregister(subject)
+	_property_cache.root = root
+	_property_cache.clear()
+	_freshness_store.clear()
 
-	for node in _sim_nodes:
-		RollbackSimulationServer.deregister_node(node)
-	_sim_nodes.clear()
+	_nodes.clear()
+	_states.clear()
 
 	# Gather all prediction-aware nodes to call during prediction ticks
-	var managed_nodes := [root] + root.find_children("*")
-	for node in managed_nodes:
-		if NetworkRollback.is_rollback_aware(node):
-			_sim_nodes.append(node)
-			RollbackSimulationServer.register(NetworkRollback._get_rollback_method(node))
+	_nodes = root.find_children("*")
+	_nodes.push_front(root)
+	_nodes = _nodes.filter(func(n): return NetworkRollback.is_rollback_aware(n))
+	_nodes.erase(self)
 
-		if NetworkRollback.is_rollback_liveness_aware(node) and not RollbackLivenessServer.is_registered(node):
-			var spawn_callback := NetworkRollback._get_rollback_spawn_method(node)
-			var despawn_callback := NetworkRollback._get_rollback_despawn_method(node)
-			var free_callback := NetworkRollback._get_rollback_destroy_method(node)
+	_state_property_config.set_properties_from_paths(state_properties, _property_cache)
 
-			RollbackLivenessServer.register(node, spawn_callback, despawn_callback, free_callback)
-			_liveness_nodes.append(node)
-
-	# Keep history of state properties
-	_state_properties.set_from_paths(root, state_properties)
-	for subject in _state_properties.get_subjects():
-		for property in _state_properties.get_properties_of(subject):
-			NetworkHistoryServer.register_rollback_state(subject, property)
-
-	# Simulated notes to participate in rollback
-	for node in _sim_nodes:
-		RollbackSimulationServer.register(NetworkRollback._get_rollback_method(node))
-
-## Mark the spawn tick for all nodes managed by this synchronizer.
-## [br][br]
-## When rewinding to a tick earlier than the spawn tick, every managed node will
-## be deactivated.
-func spawn(p_tick: int = NetworkRollback.tick) -> void:
-	for node in _liveness_nodes:
-		RollbackLivenessServer.spawn(node, p_tick)
-
-## Mark the despawn tick for all nodes managed by this synchronizer.
-## [br][br]
-## When rewinding to a tick later than the despawn tick, every managed node will
-## be deactivated.
-func despawn(p_tick: int = NetworkRollback.tick) -> void:
-	for node in _liveness_nodes:
-		RollbackLivenessServer.despawn(node, p_tick)
-
-## Return true if nodes managed by this synchronizer are alive.
-## [br][br]
-## Note that this method assumes that all node liveness is managed by the
-## synchronizer. If some node livenesses are handled separately, this method
-## may return the wrong liveness. In that case, use
-## [method _RollbackLivenessServer.is_alive] and check for individual
-## nodes.
-func is_alive(p_tick: int = NetworkRollback.tick) -> bool:
-	if _liveness_nodes.is_empty():
-		return true
-	return RollbackLivenessServer.is_alive(_liveness_nodes.front(), p_tick)
+	if _history_recorder == null:
+		_history_recorder = _RollbackHistoryRecorder.new()
+	
+	var _inputs := _PropertyHistoryBuffer.new()
+	var _input_property_config := _PropertyConfig.new()
+	_history_recorder.configure(_states, _inputs, _state_property_config, _input_property_config, _property_cache, _skipset)
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -104,6 +72,41 @@ func _ready() -> void:
 
 	process_settings.call_deferred()
 
+func _connect_signals() -> void:
+	NetworkTime.before_tick.connect(_before_tick)
+	NetworkTime.after_tick.connect(_after_tick)
+	
+	NetworkRollback.on_prepare_tick.connect(_on_prepare_tick)
+	NetworkRollback.on_process_tick.connect(_run_prediction_tick)
+	NetworkRollback.on_record_tick.connect(_on_record_tick)
+
+func _disconnect_signals() -> void:
+	NetworkTime.before_tick.disconnect(_before_tick)
+	NetworkTime.after_tick.disconnect(_after_tick)
+	
+	NetworkRollback.on_prepare_tick.disconnect(_on_prepare_tick)
+	NetworkRollback.on_process_tick.disconnect(_run_prediction_tick)
+	NetworkRollback.on_record_tick.disconnect(_on_record_tick)
+
+func _before_tick(_dt: float, tick: int) -> void:
+	_history_recorder.apply_state(tick)
+
+func _after_tick(_dt: float, tick: int) -> void:
+	_history_recorder.trim_history()
+	_freshness_store.trim()
+
+func _on_prepare_tick(tick: int) -> void:
+	_history_recorder.apply_tick(tick)
+
+func _on_record_tick(tick: int) -> void:
+	_history_recorder.record_state(tick)
+
+func _run_prediction_tick(tick: int) -> void:
+	for node in _nodes:
+		var is_fresh := _freshness_store.is_fresh(node, tick)
+		NetworkRollback.process_rollback(node, NetworkTime.ticktime, tick, is_fresh)
+		_freshness_store.notify_processed(node, tick)
+
 func _enter_tree() -> void:
 	if Engine.is_editor_hint():
 		return
@@ -111,7 +114,14 @@ func _enter_tree() -> void:
 	if not NetworkTime.is_initial_sync_done():
 		# Wait for time sync to complete
 		await NetworkTime.after_sync
+	_connect_signals.call_deferred()
 	process_settings.call_deferred()
+
+func _exit_tree() -> void:
+	if Engine.is_editor_hint():
+		return
+
+	_disconnect_signals()
 
 func _reprocess_settings() -> void:
 	if not _properties_dirty or Engine.is_editor_hint():
@@ -137,13 +147,6 @@ func add_state(node: Variant, property: String):
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_EDITOR_PRE_SAVE:
 		update_configuration_warnings()
-	if what == NOTIFICATION_PREDELETE:
-		for node in _sim_nodes:
-			RollbackSimulationServer.deregister_node(node)
-		for node in _liveness_nodes:
-			RollbackLivenessServer.deregister(node)
-		for subject in _state_properties.get_subjects():
-			NetworkHistoryServer.deregister(subject)
 
 func _get_configuration_warnings() -> PackedStringArray:
 	if not root:

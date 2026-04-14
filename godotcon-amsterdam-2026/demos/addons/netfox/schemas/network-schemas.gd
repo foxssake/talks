@@ -3,7 +3,7 @@ class_name NetworkSchemas
 
 ## Provides various schema serializers
 ##
-## While some method names are abbreviated, they use a few naming schemes. For
+## While some method names are abbreviated, they use a few naming schemes. For 
 ## example: [br][br]
 ## [method uint16] - unsigned integer, 16 bits[br]
 ## [method vec2t] - [Vector2], component of specified [i]type[/i][br]
@@ -54,19 +54,6 @@ static func uint32() -> NetworkSchemaSerializer:
 ## Final size is 8 bytes.
 static func uint64() -> NetworkSchemaSerializer:
 	return _Uint64Serializer.new()
-
-## Serialize an unsigned integer as a variable amount of bytes.
-## [br][br]
-## Each byte contains 7 bits of data. The 8th bit indicates whether there are
-## more bytes left. Thus, small numbers fitting into 7 bits will be encoded as
-## a single byte, while larger numbers take more space as they increase.
-## [br][br]
-## Final size is 1 byte for every 7 bits of numeric data.
-static func varuint() -> NetworkSchemaSerializer:
-	return _VaruintSerializer.instance
-
-static func _varbits() -> NetworkSchemaSerializer:
-	return _VariableBitsetSerializer.instance
 
 ## Serialize signed integers as 8 bits.
 ## [br][br]
@@ -228,7 +215,7 @@ static func vec2f64() -> NetworkSchemaSerializer:
 ## Serializes 3 components, size depends on the [param component_serializer].
 static func vec3t(component_serializer: NetworkSchemaSerializer) -> NetworkSchemaSerializer:
 	return _GenericVec3Serializer.new(component_serializer)
-
+	
 ## Serialize [Vector3] objects, with each component being a half-precision
 ## float.
 ## [br][br]
@@ -383,7 +370,7 @@ static func quatf64() -> NetworkSchemaSerializer:
 ## Serialize [Transform2D] objects, using [param component_serializer] to
 ## serialize each component of the transform.
 ## [br][br]
-## Serializes a 2x3 matrix in 6 components, final size depends on [param
+## Serializes a 2x3 matrix in 6 components, final size depends on [param 
 ## component_serializer].
 static func transform2t(component_serializer: NetworkSchemaSerializer) -> NetworkSchemaSerializer:
 	return _GenericTransform2DSerializer.new(component_serializer)
@@ -415,11 +402,11 @@ static func transform2f64() -> NetworkSchemaSerializer:
 ## Serialize [Transform3D] objects, using [param component_serializer] to
 ## serialize each component of the transform.
 ## [br][br]
-## Serializes a 3x4 matrix in 12 components, final size depends on [param
+## Serializes a 3x4 matrix in 12 components, final size depends on [param 
 ## component_serializer].
 static func transform3t(component_serializer: NetworkSchemaSerializer) -> NetworkSchemaSerializer:
 	return _GenericTransform3DSerializer.new(component_serializer)
-
+	
 ## Serialize [Transform3D] objects, with each component being a half-precision
 ## float.
 ## [br][br]
@@ -469,16 +456,12 @@ static func dictionary(key_serializer: NetworkSchemaSerializer = variant(),
 	size_serializer: NetworkSchemaSerializer = uint16()) -> NetworkSchemaSerializer:
 	return _DictionarySerializer.new(key_serializer, value_serializer, size_serializer)
 
-# Serializes [_NetworkIdentityReference] objects
-static func _netref() -> NetworkSchemaSerializer:
-	return _NetworkIdentityReferenceSerializer.new()
-
 # Serializer classes
 
 class _VariantSerializer extends NetworkSchemaSerializer:
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		b.put_var(v, false)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return b.get_var(false)
 
@@ -492,7 +475,7 @@ class _StringSerializer extends NetworkSchemaSerializer:
 class _BoolSerializer extends NetworkSchemaSerializer:
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		b.put_u8(1 if v else 0)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return b.get_u8() > 0
 
@@ -528,81 +511,6 @@ class _Int64Serializer extends NetworkSchemaSerializer:
 	func encode(v: Variant, b: StreamPeerBuffer) -> void: b.put_64(v)
 	func decode(b: StreamPeerBuffer) -> Variant: return b.get_64()
 
-class _VaruintSerializer extends NetworkSchemaSerializer:
-	static var instance := _VaruintSerializer.new()
-
-	func encode(v: Variant, b: StreamPeerBuffer) -> void:
-		var value := v as int
-		for __ in 8:									# Bounded while loop
-			var nominator := value & 0b0111_1111		# Grab the lowest 7 bits
-			var continuator := value > 0b0111_1111		# Continue if more bits
-			var cont_bit := 0b1000_0000 if continuator else 0
-			var byte := nominator | cont_bit			# Combine into 1 byte
-			value = value >> 7							# Discard lower 7 bits
-			b.put_u8(byte)								# Save byte
-
-			# Stop if no more bytes to write
-			if not continuator:
-				break
-
-	func decode(b: StreamPeerBuffer) -> Variant:
-		var value := 0
-		for i in 8:
-			var byte := b.get_u8()
-			var nominator := byte & 0b0111_1111
-			var continuator := (byte & 0b1000_0000) != 0
-			value += nominator << (i * 7)
-
-			if not continuator:
-				break
-		return value
-
-class _VariableBitsetSerializer extends NetworkSchemaSerializer:
-	static var instance := _VariableBitsetSerializer.new()
-
-	func encode(v: Variant, b: StreamPeerBuffer) -> void:
-		var bitset := v as _Bitset
-		if bitset.is_empty():
-			b.put_u8(0)
-			return
-
-		for i in range(0, bitset.bit_count(), 7):
-			var byte := 0
-
-			# Set bits
-			if bitset.bit_count() > i + 0 and bitset.get_bit(i + 0): byte |= 0x01
-			if bitset.bit_count() > i + 1 and bitset.get_bit(i + 1): byte |= 0x02
-			if bitset.bit_count() > i + 2 and bitset.get_bit(i + 2): byte |= 0x04
-			if bitset.bit_count() > i + 3 and bitset.get_bit(i + 3): byte |= 0x08
-			if bitset.bit_count() > i + 4 and bitset.get_bit(i + 4): byte |= 0x10
-			if bitset.bit_count() > i + 5 and bitset.get_bit(i + 5): byte |= 0x20
-			if bitset.bit_count() > i + 6 and bitset.get_bit(i + 6): byte |= 0x40
-
-			# Set highest bit if there's more bytes to read
-			if bitset.bit_count() > i + 7: byte |= 80
-
-			b.put_u8(byte)
-
-	func decode(b: StreamPeerBuffer) -> Variant:
-		var bools := []
-
-		while true:
-			var byte := b.get_u8()
-
-			bools.append(byte & 0x01)
-			bools.append(byte & 0x02)
-			bools.append(byte & 0x04)
-			bools.append(byte & 0x08)
-			bools.append(byte & 0x10)
-			bools.append(byte & 0x20)
-			bools.append(byte & 0x40)
-
-			# Stop if no more data to read
-			if byte & 0x80 == 0:
-				break
-
-		return _Bitset.of_bools(bools)
-
 class _Float16Serializer extends NetworkSchemaSerializer:
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		if Engine.get_version_info().hex >= 0x040400:
@@ -626,20 +534,20 @@ class _Float64Serializer extends NetworkSchemaSerializer:
 
 class _GenericVec2Serializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		component.encode(v.x, b)
 		component.encode(v.y, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Vector2(component.decode(b), component.decode(b))
 
 class _GenericVec3Serializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
@@ -647,7 +555,7 @@ class _GenericVec3Serializer extends NetworkSchemaSerializer:
 		component.encode(v.x, b)
 		component.encode(v.y, b)
 		component.encode(v.z, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Vector3(
 			component.decode(b), component.decode(b), component.decode(b)
@@ -655,19 +563,19 @@ class _GenericVec3Serializer extends NetworkSchemaSerializer:
 
 class _Normal2Serializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		component.encode((v as Vector2).angle(), b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Vector2.RIGHT.rotated(component.decode(b))
 
 class _Normal3Serializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
@@ -675,7 +583,7 @@ class _Normal3Serializer extends NetworkSchemaSerializer:
 		var uv := (v as Vector3).octahedron_encode()
 		component.encode(uv.x, b)
 		component.encode(uv.y, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Vector3.octahedron_decode(
 			Vector2(component.decode(b), component.decode(b))
@@ -683,7 +591,7 @@ class _Normal3Serializer extends NetworkSchemaSerializer:
 
 class _GenericVec4Serializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
@@ -692,7 +600,7 @@ class _GenericVec4Serializer extends NetworkSchemaSerializer:
 		component.encode(v.y, b)
 		component.encode(v.z, b)
 		component.encode(v.w, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Vector4(
 			component.decode(b), component.decode(b), component.decode(b), component.decode(b)
@@ -700,7 +608,7 @@ class _GenericVec4Serializer extends NetworkSchemaSerializer:
 
 class _GenericQuaternionSerializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
@@ -709,7 +617,7 @@ class _GenericQuaternionSerializer extends NetworkSchemaSerializer:
 		component.encode(v.y, b)
 		component.encode(v.z, b)
 		component.encode(v.w, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		return Quaternion(
 			component.decode(b), component.decode(b), component.decode(b), component.decode(b)
@@ -717,13 +625,13 @@ class _GenericQuaternionSerializer extends NetworkSchemaSerializer:
 
 class _GenericTransform2DSerializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		var t := v as Transform2D
-
+		
 		component.encode(t.x.x, b); component.encode(t.x.y, b)
 		component.encode(t.y.x, b); component.encode(t.y.y, b)
 		component.encode(t.origin.x, b); component.encode(t.origin.y, b)
@@ -737,7 +645,7 @@ class _GenericTransform2DSerializer extends NetworkSchemaSerializer:
 
 class _GenericTransform3DSerializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer):
 		component = p_component
 
@@ -765,7 +673,7 @@ class _QuantizingSerializer extends NetworkSchemaSerializer:
 	var from_max: Variant
 	var to_min: Variant
 	var to_max: Variant
-
+	
 	func _init(
 		p_component: NetworkSchemaSerializer, p_from_min: Variant,
 		p_from_max: Variant, p_to_min: Variant, p_to_max: Variant
@@ -808,38 +716,38 @@ class _ModuloSerializer extends NetworkSchemaSerializer:
 class _ArraySerializer extends NetworkSchemaSerializer:
 	var component: NetworkSchemaSerializer
 	var size: NetworkSchemaSerializer
-
+	
 	func _init(p_component: NetworkSchemaSerializer, p_size: NetworkSchemaSerializer):
 		component = p_component
 		size = p_size
-
+	
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		var array := v as Array
 
 		size.encode(array.size(), b)
 		for item in array:
 			component.encode(item, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		var array := []
-
+		
 		var item_count = size.decode(b)
 		array.resize(item_count)
 		for i in item_count:
 			array[i] = component.decode(b)
-
+		
 		return array
 
 class _DictionarySerializer extends NetworkSchemaSerializer:
 	var key_serializer: NetworkSchemaSerializer
 	var value_serializer: NetworkSchemaSerializer
 	var size_serializer: NetworkSchemaSerializer
-
+	
 	func _init(p_key_serializer: NetworkSchemaSerializer, p_value_serializer: NetworkSchemaSerializer, p_size_serializer: NetworkSchemaSerializer):
 		key_serializer = p_key_serializer
 		value_serializer = p_value_serializer
 		size_serializer = p_size_serializer
-
+	
 	func encode(v: Variant, b: StreamPeerBuffer) -> void:
 		var dictionary := v as Dictionary
 
@@ -848,35 +756,14 @@ class _DictionarySerializer extends NetworkSchemaSerializer:
 			var value = dictionary[key]
 			key_serializer.encode(key, b)
 			value_serializer.encode(value, b)
-
+	
 	func decode(b: StreamPeerBuffer) -> Variant:
 		var dictionary := {}
-
+		
 		var size = size_serializer.decode(b)
 		for i in size:
 			var key = key_serializer.decode(b)
 			var value = value_serializer.decode(b)
 			dictionary[key] = value
-
+		
 		return dictionary
-
-class _NetworkIdentityReferenceSerializer extends NetworkSchemaSerializer:
-	static var varuint := _VaruintSerializer.new()
-
-	func encode(v: Variant, b: StreamPeerBuffer) -> void:
-		var ref := v as _NetworkIdentityReference
-		if ref.has_id():
-			varuint.encode(ref.get_id(), b)
-		else:
-			b.put_u8(0)
-			# TODO(#562): Get rid of Godot's prepended 32 bits of string length
-			# TODO(#562): Write is easy, prefer not manually iterating till \0 on read
-			b.put_utf8_string(ref.get_full_name())
-
-	func decode(b: StreamPeerBuffer) -> Variant:
-		var id := varuint.decode(b) as int
-		if id == 0:
-			var full_name := b.get_utf8_string()
-			return _NetworkIdentityReference.of_full_name(full_name)
-		else:
-			return _NetworkIdentityReference.of_id(id)

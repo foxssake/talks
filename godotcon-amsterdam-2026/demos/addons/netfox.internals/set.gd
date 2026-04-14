@@ -10,11 +10,6 @@ static func of(items: Array) -> _Set:
 		result.add(item)
 	return result
 
-func duplicate(deep: bool = false) -> _Set:
-	var result := _Set.new()
-	result._data = _data.duplicate(deep)
-	return result
-
 func add(value):
 	_data[value] = true
 
@@ -50,9 +45,6 @@ func equals(other) -> bool:
 
 func _to_string():
 	return "Set" + str(values())
-
-func _to_vest():
-	return _data.keys()
 
 func _iter_init(arg) -> bool:
 	_iterator_idx = 0

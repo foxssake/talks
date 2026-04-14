@@ -1,8 +1,6 @@
 extends RefCounted
 class_name _PropertyConfig
 
-# @private class
-
 var _properties: Array[PropertyEntry] = []
 var _auth_properties: Dictionary = {} # Peer (int) to owned properties (Array[PropertyEntry])
 
