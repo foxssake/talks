@@ -20,6 +20,11 @@ func _ready() -> void:
 	decent_connection_button.pressed.connect(func(): _set_latency(50))
 	horrible_connection_button.pressed.connect(func(): _set_latency(250))
 
+	cheat_button.pressed.connect(func():
+		Cheats.toggle()
+		cheat_button.text = "Cheats Active!" if Cheats.is_active() else "Cheat!"
+	)
+
 func _physics_process(_dt: float) -> void:
 	_update_enet_stats()
 

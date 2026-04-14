@@ -3,6 +3,8 @@ extends CharacterBody3D
 @export var move_speed := 8.
 @export var gravity := 24.
 
+@onready var state_synchronizer: StateSynchronizer = $StateSynchronizer
+
 func _ready() -> void:
 	# Set player color
 	var color := Utils.generate_player_color(get_multiplayer_authority())
@@ -10,6 +12,12 @@ func _ready() -> void:
 
 	# Connect signals
 	NetworkTime.on_tick.connect(_tick)
+
+	# Set schema for better bandwidth usage
+	state_synchronizer.set_schema({
+		":position": NetworkSchemas.vec3f16(),
+		":quaternion": NetworkSchemas.quatf16()
+	})
 
 func _tick(dt: float, _t: int) -> void:
 	if not is_multiplayer_authority():
@@ -32,6 +40,8 @@ func _tick(dt: float, _t: int) -> void:
 	velocity.x = movement.x
 	velocity.y -= gravity * dt
 	velocity.z = movement.z
+
+	Cheats.use_if_active(self)
 
 	velocity *= NetworkTime.physics_factor
 	move_and_slide()

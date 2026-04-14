@@ -33,4 +33,6 @@ func _physics_process(dt: float) -> void:
 	velocity.y -= gravity * dt
 	velocity.z = movement.z
 
+	Cheats.use_if_active(self)
+
 	move_and_slide()
