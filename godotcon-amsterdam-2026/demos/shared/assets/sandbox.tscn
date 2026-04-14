@@ -29,8 +29,9 @@ environment = SubResource("Environment_si334")
 
 [node name="LightmapGI" type="LightmapGI" parent="." unique_id=494217854]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
-quality = 2
+quality = 3
 supersampling = true
+bounces = 4
 shadowmask_mode = 2
 light_data = ExtResource("1_7dnar")
 
@@ -87,16 +88,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -6, -6)
 size = Vector3(6, 6, 6)
 box_projection = true
 
-[node name="sandbox" parent="." unique_id=526554208 instance=ExtResource("1_ksnu8")]
+[node name="sandbox" parent="." unique_id=1274782904 instance=ExtResource("1_ksnu8")]
 
-[node name="Sun" parent="sandbox" index="2" unique_id=908817582]
+[node name="Sun" parent="sandbox" index="2" unique_id=152919050]
 shadow_enabled = true
 
-[node name="Point" parent="sandbox" index="3" unique_id=623204596]
+[node name="Point" parent="sandbox" index="3" unique_id=1053355142]
 light_energy = 4.0
 shadow_enabled = true
 
-[node name="Spot" parent="sandbox/Lamp" parent_id_path=PackedInt32Array(526554208, 2110081033) index="0" unique_id=1562110303]
+[node name="Spot" parent="sandbox/Lamp" parent_id_path=PackedInt32Array(1274782904, 257581268) index="0" unique_id=488049231]
 light_energy = 48.0
 shadow_enabled = true
 
