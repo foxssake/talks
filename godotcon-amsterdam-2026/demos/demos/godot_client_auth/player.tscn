@@ -1,40 +1,6 @@
 [gd_scene format=3 uid="uid://bta26yrd43g4v"]
 
-[sub_resource type="GDScript" id="GDScript_0bu3b"]
-script/source = "extends CharacterBody3D
-
-@export var move_speed := 8.
-@export var gravity := 24.
-
-func _ready() -> void:
-	# Set player color
-	var color := Utils.generate_player_color(get_multiplayer_authority())
-	Utils.override_mesh_color(self, color)
-
-func _physics_process(dt: float) -> void:
-	if not is_multiplayer_authority():
-		return
-
-	var input_movement := Vector3(
-		Input.get_axis(\"move_west\", \"move_east\"),
-		0.,
-		Input.get_axis(\"move_north\", \"move_south\")
-	)
-	if not DisplayServer.window_is_focused():
-		input_movement = Vector3.ZERO
-
-	var movement_basis := get_viewport().get_camera_3d().basis
-
-	var movement := movement_basis * input_movement
-	movement.y = 0.
-	movement = movement.normalized() * move_speed
-
-	velocity.x = movement.x
-	velocity.y -= gravity * dt
-	velocity.z = movement.z
-
-	move_and_slide()
-"
+[ext_resource type="Script" uid="uid://bm6ccsqdw1853" path="res://demos/godot_client_auth/scripts/player.gd" id="1_8pphn"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0bu3b"]
 
@@ -55,7 +21,7 @@ properties/1/replication_mode = 1
 physics_interpolation_mode = 1
 floor_max_angle = 1.0471976
 floor_snap_length = 0.25
-script = SubResource("GDScript_0bu3b")
+script = ExtResource("1_8pphn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1579586147]
 gi_mode = 2

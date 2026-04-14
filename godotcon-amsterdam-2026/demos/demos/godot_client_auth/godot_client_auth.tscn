@@ -1,67 +1,8 @@
 [gd_scene format=3 uid="uid://sh0vsp567ycd"]
 
 [ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_06hxl"]
-
-[sub_resource type="GDScript" id="GDScript_06hxl"]
-script/source = "extends MultiplayerSpawner
-
-@export var spawn_points: Array[Node3D]
-
-var _avatars := {} as Dictionary[int, Node3D]
-
-func _ready() -> void:
-	spawn_function = _spawn
-
-	NetworkEvents.on_server_start.connect(func(): spawn(1))
-	NetworkEvents.on_peer_join.connect(func(peer: int): spawn(peer))
-	NetworkEvents.on_peer_leave.connect(func(peer: int): _despawn(peer))
-
-func _spawn(peer: int) -> Node3D:
-	var spawnable_scene := load(get_spawnable_scene(0)) as PackedScene
-	var avatar := spawnable_scene.instantiate() as Node3D
-
-	avatar.set_multiplayer_authority(peer)
-	_avatars[peer] = avatar
-
-	var spawn_idx := peer % spawn_points.size()
-	avatar.position = spawn_points[spawn_idx].global_position
-
-	return avatar
-
-func _despawn(peer: int) -> void:
-	if not _avatars.has(peer):
-		return
-
-	var avatar := _avatars[peer]
-	avatar.queue_free()
-	_avatars.erase(peer)
-"
-
-[sub_resource type="GDScript" id="GDScript_gtbv1"]
-script/source = "extends Label
-
-func _physics_process(_dt: float) -> void:
-	text = _get_multiplayer_label()
-
-func _get_multiplayer_label() -> String:
-	if not multiplayer.has_multiplayer_peer():
-		return \"disconnected\"
-
-	if multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED:
-		return \"disconnected\"
-
-	if multiplayer.is_server():
-		return \"server\"
-
-	return \"client #%d\" % multiplayer.get_unique_id()
-"
-
-[sub_resource type="GDScript" id="GDScript_wtker"]
-script/source = "extends Label
-
-func _physics_process(_dt: float) -> void:
-	text = \"FPS: ~%d\" % [Engine.get_frames_per_second()]
-"
+[ext_resource type="Script" uid="uid://btff00qaww6uo" path="res://shared/scripts/spawner.gd" id="2_gtbv1"]
+[ext_resource type="PackedScene" uid="uid://dxw74vrvvm3ov" path="res://shared/assets/ui.tscn" id="2_wtker"]
 
 [node name="GodotClientAuth" type="Node3D" unique_id=400555213]
 
@@ -70,49 +11,10 @@ func _physics_process(_dt: float) -> void:
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=290321312 node_paths=PackedStringArray("spawn_points")]
 _spawnable_scenes = PackedStringArray("uid://bta26yrd43g4v")
 spawn_path = NodePath(".")
-script = SubResource("GDScript_06hxl")
+script = ExtResource("2_gtbv1")
 spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
 
-[node name="UI" type="Control" parent="." unique_id=41675039]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Top Bar" type="PanelContainer" parent="UI" unique_id=1653380441]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 72.0
-grow_horizontal = 2
-
-[node name="Whoami" type="VBoxContainer" parent="UI/Top Bar" unique_id=1618387780]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 7.0
-
-[node name="Label" type="Label" parent="UI/Top Bar/Whoami" unique_id=1803490907]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 32
-text = "Server"
-horizontal_alignment = 1
-vertical_alignment = 1
-uppercase = true
-script = SubResource("GDScript_gtbv1")
-
-[node name="Stats" type="HBoxContainer" parent="UI/Top Bar/Whoami" unique_id=625176131]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="UI/Top Bar/Whoami/Stats" unique_id=1732968701]
-layout_mode = 2
-text = "FPS: ~"
-script = SubResource("GDScript_wtker")
+[node name="UI" parent="." unique_id=1035520272 instance=ExtResource("2_wtker")]
 
 [editable path="Sandbox"]
 [editable path="Sandbox/sandbox"]
