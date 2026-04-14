@@ -3,11 +3,23 @@
 [ext_resource type="LightmapGIData" uid="uid://ctq8k2x0mh054" path="res://shared/assets/sandbox.lmbake" id="1_7dnar"]
 [ext_resource type="PackedScene" uid="uid://ed03p1exin7u" path="res://shared/assets/sandbox.blend" id="1_ksnu8"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ksnu8"]
-sky_top_color = Color(0.242, 0.3278, 0.44, 1)
+[sub_resource type="Gradient" id="Gradient_gy3tv"]
+interpolation_mode = 2
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.5547786, 1)
+colors = PackedColorArray(0.125, 0.17708334, 0.25, 1, 0.1925, 0.258125, 0.35, 1, 0.95, 0.97083336, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_dp306"]
+gradient = SubResource("Gradient_gy3tv")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_gby5k"]
+panorama = SubResource("GradientTexture2D_dp306")
 
 [sub_resource type="Sky" id="Sky_7dnar"]
-sky_material = SubResource("ProceduralSkyMaterial_ksnu8")
+sky_material = SubResource("PanoramaSkyMaterial_gby5k")
 
 [sub_resource type="Environment" id="Environment_si334"]
 background_mode = 2
@@ -33,6 +45,7 @@ quality = 3
 supersampling = true
 bounces = 4
 shadowmask_mode = 2
+interior = true
 light_data = ExtResource("1_7dnar")
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="LightmapGI" unique_id=1171938064]
@@ -96,6 +109,11 @@ shadow_enabled = true
 [node name="Point" parent="sandbox" index="3" unique_id=1053355142]
 light_energy = 4.0
 shadow_enabled = true
+
+[node name="Camera" parent="sandbox" index="4" unique_id=596847182]
+size = 32.0
+near = 4.0
+far = 64.0
 
 [node name="Spot" parent="sandbox/Lamp" parent_id_path=PackedInt32Array(1274782904, 257581268) index="0" unique_id=488049231]
 light_energy = 48.0

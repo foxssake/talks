@@ -7,7 +7,7 @@
 interpolation_mode = 2
 interpolation_color_space = 2
 offsets = PackedFloat32Array(0, 0.39030024, 1)
-colors = PackedColorArray(0, 0, 0, 0.7529412, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_di6us"]
 gradient = SubResource("Gradient_ymc6u")
@@ -21,7 +21,7 @@ texture = SubResource("GradientTexture2D_di6us")
 interpolation_mode = 2
 interpolation_color_space = 2
 offsets = PackedFloat32Array(0, 0.39030024, 1)
-colors = PackedColorArray(0, 0, 0, 0.7529412, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_ug00n"]
 gradient = SubResource("Gradient_di6us")
@@ -43,6 +43,7 @@ theme = ExtResource("1_ug00n")
 script = ExtResource("1_di6us")
 
 [node name="Top Bar" type="PanelContainer" parent="." unique_id=1909841857]
+self_modulate = Color(1, 1, 1, 0.3764706)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -55,7 +56,7 @@ layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 96
+theme_override_constants/margin_bottom = 32
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Top Bar/MarginContainer" unique_id=1794846523]
 layout_mode = 2
@@ -72,22 +73,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="Stats" type="HBoxContainer" parent="Top Bar/MarginContainer/VBoxContainer" unique_id=1988106367]
-layout_mode = 2
-
-[node name="FPS Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer/Stats" unique_id=852805188]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "FPS: ~"
-
-[node name="Latency Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer/Stats" unique_id=397495801]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Latency: ~ms"
-
 [node name="Bottom Bar" type="PanelContainer" parent="." unique_id=87198902]
+self_modulate = Color(1, 1, 1, 0.3764706)
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -100,47 +87,66 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_np2q4")
 [node name="MarginContainer" type="MarginContainer" parent="Bottom Bar" unique_id=1455127209]
 layout_mode = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 96
+theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Bottom Bar/MarginContainer" unique_id=2114704694]
+[node name="VBoxContainer" type="VBoxContainer" parent="Bottom Bar/MarginContainer" unique_id=966356107]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1836543692]
+[node name="Stats" type="HBoxContainer" parent="Bottom Bar/MarginContainer/VBoxContainer" unique_id=1039239749]
+layout_mode = 2
+
+[node name="FPS Label" type="Label" parent="Bottom Bar/MarginContainer/VBoxContainer/Stats" unique_id=1904157769]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "FPS: ~"
+
+[node name="Latency Label" type="Label" parent="Bottom Bar/MarginContainer/VBoxContainer/Stats" unique_id=1252727267]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+text = "Latency: ~ms"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Bottom Bar/MarginContainer/VBoxContainer" unique_id=2114704694]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1836543692]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Network:"
 
-[node name="Perfect Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=970154368]
+[node name="Perfect Connection Button" type="Button" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=970154368]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Perfect"
 
-[node name="Good Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=708667013]
+[node name="Good Connection Button" type="Button" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=708667013]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Good"
 
-[node name="Decent Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1356062686]
+[node name="Decent Connection Button" type="Button" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1356062686]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Decent"
 
-[node name="Horrible Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1769020716]
+[node name="Horrible Connection Button" type="Button" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1769020716]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Horrible"
 
-[node name="VSeparator" type="VSeparator" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1925775641]
+[node name="VSeparator" type="VSeparator" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1925775641]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Cheat Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1144710792]
+[node name="Cheat Button" type="Button" parent="Bottom Bar/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1144710792]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
