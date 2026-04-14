@@ -15,6 +15,7 @@ script = ExtResource("2_pxubc")
 spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
 
 [node name="UI" parent="." unique_id=1035520272 instance=ExtResource("2_3co61")]
+_mode_text = "netfox with server authority"
 
 [editable path="Sandbox"]
 [editable path="Sandbox/sandbox"]

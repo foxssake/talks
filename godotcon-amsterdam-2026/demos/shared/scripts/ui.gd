@@ -1,6 +1,9 @@
 extends Control
 
+@export var _mode_text := ""
+
 @onready var title_label := %"Title Label" as Label
+@onready var mode_label: Label = %"Mode Label"
 @onready var fps_label := %"FPS Label" as Label
 @onready var latency_label := %"Latency Label" as Label
 
@@ -15,6 +18,8 @@ var _rtt := 0.
 var _rtt_variance := 0.
 
 func _ready() -> void:
+	mode_label.text = _mode_text
+
 	perfect_connection_button.pressed.connect(func(): _set_latency(0))
 	good_connection_button.pressed.connect(func(): _set_latency(10))
 	decent_connection_button.pressed.connect(func(): _set_latency(50))

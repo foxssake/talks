@@ -6,8 +6,7 @@
 [sub_resource type="Gradient" id="Gradient_ymc6u"]
 interpolation_mode = 2
 interpolation_color_space = 2
-offsets = PackedFloat32Array(0, 0.39030024, 1)
-colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_di6us"]
 gradient = SubResource("Gradient_ymc6u")
@@ -58,7 +57,7 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 32
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Top Bar/MarginContainer" unique_id=1794846523]
+[node name="VBoxContainer" type="HBoxContainer" parent="Top Bar/MarginContainer" unique_id=122360061]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 7.0
@@ -66,12 +65,20 @@ size_flags_stretch_ratio = 7.0
 [node name="Title Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer" unique_id=1380360780]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"HeaderLarge"
 text = "Server"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
+
+[node name="Mode Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer" unique_id=1396391633]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+vertical_alignment = 1
 
 [node name="Bottom Bar" type="PanelContainer" parent="." unique_id=87198902]
 self_modulate = Color(1, 1, 1, 0.3764706)
