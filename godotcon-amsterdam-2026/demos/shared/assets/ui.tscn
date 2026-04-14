@@ -1,30 +1,36 @@
 [gd_scene format=3 uid="uid://dxw74vrvvm3ov"]
 
-[sub_resource type="GDScript" id="GDScript_7ren2"]
-script/source = "extends Label
+[ext_resource type="Script" uid="uid://c0ycvbdcfcc21" path="res://shared/scripts/ui.gd" id="1_di6us"]
+[ext_resource type="Theme" uid="uid://3xybju6ydml3" path="res://shared/assets/ui_theme.tres" id="1_ug00n"]
 
-func _physics_process(_dt: float) -> void:
-	text = _get_multiplayer_label()
+[sub_resource type="Gradient" id="Gradient_ymc6u"]
+interpolation_mode = 2
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.39030024, 1)
+colors = PackedColorArray(0, 0, 0, 0.7529412, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
 
-func _get_multiplayer_label() -> String:
-	if not multiplayer.has_multiplayer_peer():
-		return \"disconnected\"
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_di6us"]
+gradient = SubResource("Gradient_ymc6u")
+fill_to = Vector2(0, 1)
+metadata/_snap_enabled = true
 
-	if multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED:
-		return \"disconnected\"
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ug00n"]
+texture = SubResource("GradientTexture2D_di6us")
 
-	if multiplayer.is_server():
-		return \"server\"
+[sub_resource type="Gradient" id="Gradient_di6us"]
+interpolation_mode = 2
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.39030024, 1)
+colors = PackedColorArray(0, 0, 0, 0.7529412, 0, 0, 0, 0.5647059, 0, 0, 0, 0)
 
-	return \"client #%d\" % multiplayer.get_unique_id()
-"
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ug00n"]
+gradient = SubResource("Gradient_di6us")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
 
-[sub_resource type="GDScript" id="GDScript_8w8lg"]
-script/source = "extends Label
-
-func _physics_process(_dt: float) -> void:
-	text = \"FPS: ~%d\" % [Engine.get_frames_per_second()]
-"
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_np2q4"]
+texture = SubResource("GradientTexture2D_ug00n")
 
 [node name="UI" type="Control" unique_id=1035520272]
 layout_mode = 3
@@ -33,6 +39,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_ug00n")
+script = ExtResource("1_di6us")
 
 [node name="Top Bar" type="PanelContainer" parent="." unique_id=1909841857]
 layout_mode = 1
@@ -40,29 +48,100 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 72.0
 grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ug00n")
 
-[node name="Whoami" type="VBoxContainer" parent="Top Bar" unique_id=1794846523]
+[node name="MarginContainer" type="MarginContainer" parent="Top Bar" unique_id=772241102]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 96
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Top Bar/MarginContainer" unique_id=1794846523]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 7.0
 
-[node name="Label" type="Label" parent="Top Bar/Whoami" unique_id=1380360780]
+[node name="Title Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer" unique_id=1380360780]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"HeaderLarge"
 text = "Server"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
-script = SubResource("GDScript_7ren2")
 
-[node name="Stats" type="HBoxContainer" parent="Top Bar/Whoami" unique_id=1988106367]
+[node name="Stats" type="HBoxContainer" parent="Top Bar/MarginContainer/VBoxContainer" unique_id=1988106367]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Top Bar/Whoami/Stats" unique_id=852805188]
+[node name="FPS Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer/Stats" unique_id=852805188]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "FPS: ~"
-script = SubResource("GDScript_8w8lg")
+
+[node name="Latency Label" type="Label" parent="Top Bar/MarginContainer/VBoxContainer/Stats" unique_id=397495801]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Latency: ~ms"
+
+[node name="Bottom Bar" type="PanelContainer" parent="." unique_id=87198902]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_np2q4")
+
+[node name="MarginContainer" type="MarginContainer" parent="Bottom Bar" unique_id=1455127209]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 96
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Bottom Bar/MarginContainer" unique_id=2114704694]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1836543692]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Network:"
+
+[node name="Perfect Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=970154368]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Perfect"
+
+[node name="Good Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=708667013]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Good"
+
+[node name="Decent Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1356062686]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Decent"
+
+[node name="Horrible Connection Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1769020716]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Horrible"
+
+[node name="VSeparator" type="VSeparator" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1925775641]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Cheat Button" type="Button" parent="Bottom Bar/MarginContainer/HBoxContainer" unique_id=1144710792]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cheat!"
