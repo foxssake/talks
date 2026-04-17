@@ -2,6 +2,11 @@ extends Control
 
 @export var _mode_text := ""
 
+@export var _ver_icon_hollow: Texture2D = preload("res://shared/assets/triangle-hollow.svg")
+@export var _ver_icon_full: Texture2D = preload("res://shared/assets/triangle-full.svg")
+@export var _hor_icon_hollow: Texture2D = preload("res://shared/assets/triangle-hollow-hor.svg")
+@export var _hor_icon_full: Texture2D = preload("res://shared/assets/triangle-full-hor.svg")
+
 @onready var title_label := %"Title Label" as Label
 @onready var mode_label: Label = %"Mode Label"
 @onready var fps_label := %"FPS Label" as Label
@@ -13,6 +18,11 @@ extends Control
 @onready var horrible_connection_button := %"Horrible Connection Button" as Button
 
 @onready var cheat_button: Button = %"Cheat Button"
+
+@onready var up_icon := %"Up Icon" as TextureRect
+@onready var left_icon := %"Left Icon" as TextureRect
+@onready var right_icon := %"Right Icon" as TextureRect
+@onready var down_icon := %"Down Icon" as TextureRect
 
 var _rtt := 0.
 var _rtt_variance := 0.
@@ -32,6 +42,7 @@ func _ready() -> void:
 
 func _physics_process(_dt: float) -> void:
 	_update_enet_stats()
+	_update_input_display()
 
 	title_label.text = _get_multiplayer_title()
 	fps_label.text = "FPS: ~%d" % [Engine.get_frames_per_second()]
@@ -63,6 +74,12 @@ func _update_enet_stats() -> void:
 
 	_rtt = host_peer.get_statistic(ENetPacketPeer.PEER_ROUND_TRIP_TIME)
 	_rtt_variance = host_peer.get_statistic(ENetPacketPeer.PEER_ROUND_TRIP_TIME_VARIANCE)
+
+func _update_input_display() -> void:
+	up_icon.texture = _ver_icon_full if Input.is_action_pressed("move_north") else _ver_icon_hollow
+	down_icon.texture = _ver_icon_full if Input.is_action_pressed("move_south") else _ver_icon_hollow
+	left_icon.texture = _hor_icon_full if Input.is_action_pressed("move_west") else _hor_icon_hollow
+	right_icon.texture = _hor_icon_full if Input.is_action_pressed("move_east") else _hor_icon_hollow
 
 func _set_latency(millis: int) -> void:
 	NetworkSimulator.latency_ms = millis

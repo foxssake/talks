@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c0ycvbdcfcc21" path="res://shared/scripts/ui.gd" id="1_di6us"]
 [ext_resource type="Theme" uid="uid://3xybju6ydml3" path="res://shared/assets/ui_theme.tres" id="1_ug00n"]
+[ext_resource type="Texture2D" uid="uid://cwq7svm8g5tca" path="res://shared/assets/triangle-hollow.svg" id="3_np2q4"]
+[ext_resource type="Texture2D" uid="uid://buvx2fjcuklyj" path="res://shared/assets/triangle-hollow-hor.svg" id="4_yycq5"]
 
 [sub_resource type="Gradient" id="Gradient_ymc6u"]
 interpolation_mode = 2
@@ -30,6 +32,22 @@ metadata/_snap_enabled = true
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_np2q4"]
 texture = SubResource("GradientTexture2D_ug00n")
+
+[sub_resource type="Gradient" id="Gradient_np2q4"]
+interpolation_mode = 2
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.35334873, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0.40944976, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yycq5"]
+gradient = SubResource("Gradient_np2q4")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+metadata/_snap_enabled = true
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6k2h0"]
+texture = SubResource("GradientTexture2D_yycq5")
 
 [node name="UI" type="Control" unique_id=1035520272]
 layout_mode = 3
@@ -158,3 +176,56 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Cheat!"
+
+[node name="Input Display" type="PanelContainer" parent="." unique_id=427445053]
+self_modulate = Color(1, 1, 1, 0.5019608)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_right = 40.0
+offset_bottom = 20.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_6k2h0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Input Display" unique_id=2108853791]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Input Display/VBoxContainer" unique_id=1839070992]
+layout_mode = 2
+
+[node name="Up Icon" type="TextureRect" parent="Input Display/VBoxContainer/HBoxContainer" unique_id=1957099093]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+texture = ExtResource("3_np2q4")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Input Display/VBoxContainer" unique_id=1217684135]
+layout_mode = 2
+
+[node name="Left Icon" type="TextureRect" parent="Input Display/VBoxContainer/HBoxContainer2" unique_id=1676836143]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("4_yycq5")
+flip_h = true
+
+[node name="Placeholder" type="TextureRect" parent="Input Display/VBoxContainer/HBoxContainer2" unique_id=1492533333]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+texture = ExtResource("4_yycq5")
+
+[node name="Right Icon" type="TextureRect" parent="Input Display/VBoxContainer/HBoxContainer2" unique_id=1929263478]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("4_yycq5")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Input Display/VBoxContainer" unique_id=1269539054]
+layout_mode = 2
+
+[node name="Down Icon" type="TextureRect" parent="Input Display/VBoxContainer/HBoxContainer3" unique_id=1875565792]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+texture = ExtResource("3_np2q4")
+flip_v = true
