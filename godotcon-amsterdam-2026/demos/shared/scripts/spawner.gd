@@ -23,6 +23,7 @@ func _spawn(peer: int) -> Node3D:
 
 	var spawn_idx := peer % spawn_points.size()
 	avatar.position = spawn_points[spawn_idx].global_position
+	avatar.scale *= 1.0	# HACK: Adjust during demo for visibility
 	avatar.name += " #%d" % peer
 
 	return avatar

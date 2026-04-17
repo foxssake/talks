@@ -71,7 +71,7 @@ move_south={
 extras/auto_tile_windows=true
 extras/borderless=true
 autoconnect/enabled=true
-autoconnect/simulated_latency_ms=250
+autoconnect/simulated_latency_ms=1
 
 [rendering]
 
