@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://sh0vsp567ycd"]
+
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_06hxl"]
+[ext_resource type="Script" uid="uid://btff00qaww6uo" path="res://shared/scripts/spawner.gd" id="2_gtbv1"]
+[ext_resource type="PackedScene" uid="uid://dxw74vrvvm3ov" path="res://shared/assets/ui.tscn" id="2_wtker"]
+
+[node name="GodotClientAuth" type="Node3D" unique_id=400555213]
+
+[node name="Sandbox" parent="." unique_id=473015736 instance=ExtResource("1_06hxl")]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=290321312 node_paths=PackedStringArray("spawn_points")]
+_spawnable_scenes = PackedStringArray("uid://bta26yrd43g4v")
+spawn_path = NodePath(".")
+script = ExtResource("2_gtbv1")
+spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
+
+[node name="UI" parent="." unique_id=1035520272 instance=ExtResource("2_wtker")]
+_mode_text = "Godot with client authority"
+
+[editable path="Sandbox"]
+[editable path="Sandbox/sandbox"]

@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bhr8fd685uop7"]
+
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_3wv24"]
+[ext_resource type="Script" uid="uid://btff00qaww6uo" path="res://shared/scripts/spawner.gd" id="2_ybymc"]
+[ext_resource type="PackedScene" uid="uid://dxw74vrvvm3ov" path="res://shared/assets/ui.tscn" id="3_n17ar"]
+
+[node name="NetfoxClientAuth" type="Node3D" unique_id=400555213]
+
+[node name="Sandbox" parent="." unique_id=473015736 instance=ExtResource("1_3wv24")]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=290321312 node_paths=PackedStringArray("spawn_points")]
+_spawnable_scenes = PackedStringArray("uid://b46m506k65ou6")
+spawn_path = NodePath(".")
+script = ExtResource("2_ybymc")
+spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
+
+[node name="UI" parent="." unique_id=1035520272 instance=ExtResource("3_n17ar")]
+_mode_text = "netfox with client authority"
+
+[editable path="Sandbox"]
+[editable path="Sandbox/sandbox"]

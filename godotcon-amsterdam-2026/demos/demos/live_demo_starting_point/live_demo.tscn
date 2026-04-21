@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://ds2vhdigceasn"]
+
+[ext_resource type="PackedScene" uid="uid://cka043pyub1a" path="res://shared/assets/sandbox.tscn" id="1_x422t"]
+[ext_resource type="Script" uid="uid://btff00qaww6uo" path="res://shared/scripts/spawner.gd" id="2_s11wb"]
+[ext_resource type="PackedScene" uid="uid://dxw74vrvvm3ov" path="res://shared/assets/ui.tscn" id="3_u4fv0"]
+
+[node name="LiveDemo" type="Node3D" unique_id=1393235173]
+
+[node name="Sandbox" parent="." unique_id=473015736 instance=ExtResource("1_x422t")]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1171691290 node_paths=PackedStringArray("spawn_points")]
+_spawnable_scenes = PackedStringArray("uid://bjy6u78oie8ee")
+spawn_path = NodePath(".")
+script = ExtResource("2_s11wb")
+spawn_points = [NodePath("../Sandbox/Spawn Points/Spawn"), NodePath("../Sandbox/Spawn Points/Spawn2"), NodePath("../Sandbox/Spawn Points/Spawn3"), NodePath("../Sandbox/Spawn Points/Spawn4"), NodePath("../Sandbox/Spawn Points/Spawn5")]
+
+[node name="UI" parent="." unique_id=1035520272 instance=ExtResource("3_u4fv0")]
+_mode_text = "Live coding demo"
+
+[editable path="Sandbox"]
+[editable path="Sandbox/sandbox"]
